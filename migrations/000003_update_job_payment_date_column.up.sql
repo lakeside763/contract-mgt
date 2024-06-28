@@ -1,0 +1,1 @@
+ALTER TABLE jobs RENAME COLUMN paymentDate TO payment_date;
