@@ -16,10 +16,7 @@ import (
 
 var (
 	DB *gorm.DB
-
-	Rdb = redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-	})
+	Rdb *redis.Client
 )
 
 func InitDB() error {
@@ -47,10 +44,20 @@ func InitDB() error {
 		return err
 	}
 
+	// Initialize redis
+	Rdb = redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+
 	// Auto migrate User model
-	DB.AutoMigrate(&models.User{})
-	DB.AutoMigrate(&models.Profile{})
-	DB.AutoMigrate(models.Contract{})
-	DB.AutoMigrate(models.Job{})
+	if err := DB.AutoMigrate(
+		&models.User{},
+		&models.Profile{},
+		&models.Contract{},
+		&models.Job{},
+	); err != nil {
+		return err
+	}
+
 	return nil
 }

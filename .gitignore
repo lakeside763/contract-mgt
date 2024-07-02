@@ -1,4 +1,4 @@
 .env
 create.sh
 .air.toml
-/tmp
+tmp

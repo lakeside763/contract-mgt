@@ -10,14 +10,22 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/lakeside763/contract-mgt/database"
 	"github.com/lakeside763/contract-mgt/models"
 	"github.com/lakeside763/contract-mgt/routes"
 )
 
+func initEnv() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+}
 
 
 func main() {
+	initEnv()
+
 	if err := database.InitDB(); err != nil {
 		log.Fatalf("Could not connect to the database: %v", err)
 	}
@@ -37,7 +45,6 @@ func main() {
 	
 	// start the server with graceful shutdown
 	runServer(router)
-	// router.Run(":5200")
 }
 
 func runServer(router *gin.Engine) {
