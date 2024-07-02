@@ -9,11 +9,25 @@ import (
 )
 
 
-func TransactionRoutes(router *gin.Engine, db *gorm.DB, authorized *gin.RouterGroup, rdb *redis.Client) {
-	authorized.Use(middlewares.AuthMiddleware(rdb))
+func TransactionRoutes(router *gin.Engine, db *gorm.DB, rdb *redis.Client) {
+	// Group routes under /v1/api/transactions
+	transactions := router.Group("/v1/api/transactions")
 	{
-		authorized.GET("/transactions/contracts", func(c *gin.Context) {handlers.GetContracts(c, db)})
-		authorized.GET("/transactions/contracts/:id", func(c *gin.Context) {handlers.GetContract(c, db)})
+		// use the authorization middleware for the group
+		transactions.Use(middlewares.AuthMiddleware(rdb))
+
+		// Define contract-related routes
+		transactions.GET("/contracts", func(c *gin.Context) {handlers.GetContracts(c, db)})
+		transactions.GET("/contracts/:id", func(c *gin.Context) {handlers.GetContract(c, db)})
+		transactions.POST("/contracts", func(c *gin.Context) {handlers.CreateContract(c, db)})
+
+		// Define job-related routes
+		transactions.POST("/jobs", func(c *gin.Context) {handlers.CreateJob(c, db)})
+		transactions.GET("/jobs", func(c *gin.Context) {handlers.GetJobs(c, db)})
+
+		// Define payment-related routes
+		transactions.POST("/jobs/payment", func(c *gin.Context) {handlers.JobPayment(c, db)})
+		transactions.POST("/payments/deposit", func(c *gin.Context) {handlers.PaymentDeposit(c, db)})
 	}
 }
 

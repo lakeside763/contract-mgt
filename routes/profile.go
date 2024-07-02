@@ -8,11 +8,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func ProfileRoutes(router *gin.Engine, db *gorm.DB, authorized *gin.RouterGroup, rdb *redis.Client) {
-	authorized.Use(middlewares.AuthMiddleware(rdb)) 
+func ProfileRoutes(router *gin.Engine, db *gorm.DB, rdb *redis.Client) {
+	profiles := router.Group("/v1/api/profiles")
 	{
-		authorized.GET("/profiles", func(c *gin.Context) {handlers.GetProfiles(c, db)})
-		authorized.GET("/profiles/:id", func(c *gin.Context) {handlers.GetProfile(c, db)})
-		authorized.POST("/profiles", func(c *gin.Context) {handlers.CreateProfile(c, db)})
+		profiles.Use(middlewares.AuthMiddleware(rdb)) 
+		profiles.GET("/", func(c *gin.Context) {handlers.GetProfiles(c, db)})
+		profiles.GET("/:id", func(c *gin.Context) {handlers.GetProfile(c, db)})
+		profiles.POST("/", func(c *gin.Context) {handlers.CreateProfile(c, db)})
 	}
 }

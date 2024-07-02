@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/lakeside763/contract-mgt/models"
 	"github.com/lakeside763/contract-mgt/services"
 	"gorm.io/gorm"
@@ -41,6 +42,12 @@ func CreateProfile(c *gin.Context, db *gorm.DB) {
 	
 	if err := c.ShouldBindJSON(&puc); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := models.Validate.Struct(puc); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		c.JSON(http.StatusBadRequest, gin.H{"errors": validationErrors.Translate(models.Trans)})
 		return
 	}
 

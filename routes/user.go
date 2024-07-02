@@ -11,8 +11,11 @@ import (
 // }
 
 
-func UserRoutes(router *gin.Engine, db *gorm.DB) {
-	router.GET("/users", func(c *gin.Context) { handlers.GetUsers(c, db) }) 
-	router.POST("/users", func(c *gin.Context) { handlers.CreateUser(c, db) })
-	router.GET("/users/:id", func(c *gin.Context) {handlers.GetUser(c, db) })
+func UserRoutes(router *gin.Engine, db *gorm.DB ) {
+	users := router.Group("/v1/api/users")
+	{
+		users.GET("/", func(c *gin.Context) { handlers.GetUsers(c, db) }) 
+		users.POST("/", func(c *gin.Context) { handlers.CreateUser(c, db) })
+		users.GET("/:id", func(c *gin.Context) {handlers.GetUser(c, db) })
+	}
 }

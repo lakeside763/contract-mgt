@@ -7,13 +7,22 @@ import (
 	"github.com/lakeside763/contract-mgt/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"github.com/go-playground/validator/v10"
 )
+
+
 
 func CreateUser(c *gin.Context, db *gorm.DB) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := models.Validate.Struct(user); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		c.JSON(http.StatusBadRequest, gin.H{"errors": validationErrors.Translate(models.Trans)})
 		return
 	}
 
@@ -82,7 +91,7 @@ func GetUsers(c *gin.Context, db *gorm.DB) {
 	}
 
 	var responseUsers []models.UserResponse
-	for _, user := range users {
+	for _, user := range users{
 		responseUser := models.UserResponse {
 			ID:					user.ID,
 			Username: 	user.Username,
